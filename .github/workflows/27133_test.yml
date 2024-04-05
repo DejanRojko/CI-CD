@@ -62,7 +62,7 @@ jobs:
         run: |
           chmod +x ./venv.sh
           ./venv.sh
-          pytest .tests/test.py
+          pytest test.py
         continue-on-error: true  # Nadaljuj tudi ob napaki
 
       - name: Check for test errors  # Preveri, ali so se pri testiranju pojavile napake
