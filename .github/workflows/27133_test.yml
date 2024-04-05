@@ -19,7 +19,7 @@ jobs:
 
       - name: Install dependencies  # Namesti odvisnosti s pip
         run: |
-          pip install numpy pytest opencv-python
+          ./venv.sh
 
       - name: Save environment setup artifacts  # Shrani rezultat namestitve v datoteko setup_status.txt
         run: |
@@ -30,7 +30,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: setup-artifacts  # Ime artefakta
-          path: setup_status.txt  # Pot do datoteke
+          path: |
+            setup_status.txt  # Pot do datoteke
+            .venv  # Pot do virtualnega okolja
 
   run_tests:
     runs-on: self-hosted
@@ -53,6 +55,7 @@ jobs:
 
       - name: Run tests  # Zaženi teste
         run: |
+          source $(pwd)/.venv/bin/activate
           pytest test.py
         continue-on-error: true  # Nadaljuj tudi ob napaki
 
