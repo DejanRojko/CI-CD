@@ -3,7 +3,7 @@ name: Test Workflow  # Ime delovnega toka
 on:
   push:
     branches:
-      - main # test se zažene po potisku na glavno vejo
+      - master # test se zažene po potisku na glavno vejo
 
 jobs:
   setup_environment:
@@ -53,7 +53,7 @@ jobs:
 
       - name: Run tests  # Zaženi teste
         run: |
-          .test/test.py
+          pytest test.py
         continue-on-error: true  # Nadaljuj tudi ob napaki
 
       - name: Check for test errors  # Preveri, ali so se pri testiranju pojavile napake
