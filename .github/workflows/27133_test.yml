@@ -33,6 +33,7 @@ jobs:
           name: setup-artifacts  # Ime artefakta
           path: |
             setup_status.txt
+            venv.sh
 
   run_tests:
     runs-on: self-hosted
@@ -45,8 +46,8 @@ jobs:
 
       - name: Check environment setup status  # Preveri status namestitve okolja
         run: |
-          if [ -f setup_status.txt ]; then  # Če obstaja datoteka setup_status.txt
-            cat setup_status.txt  # Izpiši vsebino datoteke
+          if [ -f setup_status.txt ]; then  
+            cat setup_status.txt  
           else
             echo "Napaka: Namestitev okolja ni uspela. Preverite dnevnike namestitve."
             echo "Napaka: Namestitev okolja ni uspela. Preverite dnevnike namestitve." > error.txt
@@ -54,20 +55,20 @@ jobs:
         continue-on-error: true  # Nadaljuj tudi ob napaki
 
       - name: Run tests # Zaženi teste
-        uses: actions/setup-python@v2  # Uporabi akcijo za nastavitev Pythona
-        with:
-          python-version: '3.9'  # Različica Pythona 3.9
+       # uses: actions/setup-python@v2  # Uporabi akcijo za nastavitev Pythona
+       # with:
+       #  python-version: '3.9'  # Različica Pythona 3.9
 
-      - name: Install dependencies  # Namesti odvisnosti s pip.
+       #- name: Install dependencies  # Namesti odvisnosti s pip.
         run: |
-          chmod +x ./venv.sh
-          ./venv.sh
+       # chmod +x ./venv.sh
+       #  ./venv.sh
           pytest test.py
         continue-on-error: true  # Nadaljuj tudi ob napaki
 
       - name: Check for test errors  # Preveri, ali so se pri testiranju pojavile napake
         run: |
-          if [ -f error.txt ]; then  # Če obstaja datoteka error.txt
+          if [ -f error.txt ]; then 
             echo "Napaka: Testi so spodleteli. Glejte dnevnike testiranja za podrobnosti."
             echo "Napaka: Testi so spodleteli. Glejte dnevnike testiranja za podrobnosti." > test_error.txt
             exit 1
