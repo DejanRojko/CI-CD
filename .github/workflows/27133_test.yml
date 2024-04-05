@@ -32,8 +32,8 @@ jobs:
         with:
           name: setup-artifacts  # Ime artefakta
           path: |
-            setup_status.txt  # Pot do datoteke
-            .venv  # Pot do virtualnega okolja
+            setup_status.txt
+            .venv
 
   run_tests:
     runs-on: self-hosted
