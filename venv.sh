@@ -16,7 +16,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 #Deaktiviraj virtualno okolje
-deactivate
+#deactivate
 
 #Pobriši virtualno okolje
 # rm -rf $VENV
