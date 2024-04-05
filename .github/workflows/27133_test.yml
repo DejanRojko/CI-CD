@@ -58,7 +58,7 @@ jobs:
         with:
           python-version: '3.9'  # Različica Pythona 3.9
 
-      - name: Install dependencies  # Namesti odvisnosti s pip
+      - name: Install dependencies  # Namesti odvisnosti s pip.
         run: |
           chmod +x ./venv.sh
           ./venv.sh
