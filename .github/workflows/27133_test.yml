@@ -19,6 +19,7 @@ jobs:
 
       - name: Install dependencies  # Namesti odvisnosti s pip
         run: |
+          chmod +x ./venv.sh
           ./venv.sh
 
       - name: Save environment setup artifacts  # Shrani rezultat namestitve v datoteko setup_status.txt
