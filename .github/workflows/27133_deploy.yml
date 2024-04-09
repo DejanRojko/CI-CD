@@ -1,35 +1,47 @@
+# Ime tega GitHub Actions delovnega procesa
 name: Deploy
 
+# Okoljske spremenljivke, ki se uporabijo v delovnem procesu
 env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  REPONAME: ${{ secrets.REPO_NAME }}
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }} # Uporabniško ime za Docker Hub
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }} # Geslo za Docker Hub
+  REPONAME: ${{ secrets.REPO_NAME }} # Ime repozitorija na Docker Hub
 
+# Dogodek, ki sproži delovni proces
 on:
   workflow_run:
-    workflows: ["Test workflow"]
+    workflows: ["Test workflow"] # Imena delovnih procesov, ki sprožijo ta delovni proces
     types:
-      - completed
+      - completed # Tip dogodka, ki sproži delovni proces
 
+# Opravila, ki se izvedejo v delovnem procesu
 jobs:
-  deploy:
-    runs-on: self-hosted
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  build-and-push:
+    runs-on: self-hosted # Na katerem strežniku naj se opravilo izvede
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} # Pogoj za izvedbo
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9] # Matrica za izvajanje z različnimi verzijami Pythona
+
+    # Koraki, ki se izvedejo v opravilu
     steps:
-      - name: Checkout repozitorija
-        uses: actions/checkout@v2
+    - name: Checkout repozitorija
+      uses: actions/checkout@v2 # Akcija za pridobitev kode iz GitHub repozitorija
       
-      - name: Prijava v Docker
-        run: |
-          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1 # Akcija za nastavitev Docker Buildx
 
-      - name: Trenutni čas
-        run: echo "date=$(date +'%Y-%m-%d--%H-%M-%S')" >> "$GITHUB_ENV"
-      
-      - name: Zgradi docker sliko
-        run: |
-          docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ env.date }}
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1 # Akcija za prijavo v Docker Hub
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Potisni docker sliko
-        run: |
-          docker push $DOCKER_USERNAME/$REPONAME:${{ env.date }}
+    - name: Build and push
+      uses: docker/build-push-action@v2 # Akcija za gradnjo in potisk Docker slike
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: $DOCKER_USERNAME/$REPONAME:python-${{ matrix.python-version }}-${{ github.run_number }}
+        build-args: PYTHON_VERSION=${{ matrix.python-version }}
