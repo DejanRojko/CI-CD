@@ -1,12 +1,13 @@
-name: Deploy Workflow  # Ime delovnega toka
+name: Deploy Workflow
 
+# Define environment variables including Docker username, password, and repository name.
 env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  # Uporabniško ime DockerHuba
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  # Geslo DockerHuba
-  REPONAME: ${{ secrets.REPO_NAME }}  # Ime repozitorija
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  # DockerHub username
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  # DockerHub password
+  REPONAME: ${{ secrets.REPO_NAME }}  # Repository name
 
 on:
-  workflow_run:  # Sproži delovni tok, ko drug delovni tok (Test Workflow) konča
+  workflow_run:
     workflows: ["Test Workflow"]
     types:
       - completed
@@ -14,35 +15,32 @@ on:
 jobs:
   deploy_to_dockerhub:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}  # Izvedi ta delovno nalogo samo, če je Test Workflow uspel
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
     steps:
-      - name: Checkout code  # Pridobi kodo iz repozitorija
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Docker login  # Prijava v DockerHub
+      - name: Docker login
         run: |
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
-      #- name: Debug print DOCKER_USERNAME and REPONAME
-      #  run: |
-      #    echo "DOCKER_USERNAME: $DOCKER_USERNAME"
-      #   echo "REPONAME: $REPONAME"
-
-      - name: Get current timestamp  # Pridobite trenutni časovni žig za označevanje slike Docker
+      # Use a timestamp to uniquely tag the Docker image.
+      - name: Get current timestamp
         id: timestamp
         run: echo "date=$(date +'%Y-%m-%d--%M-%S')" >> "$GITHUB_ENV"
 
+      # Build the Docker image with a unique tag based on the timestamp.
       - name: Build Docker image
         run: |
-          echo ${{ steps.timestamp.outputs.date }}
-          docker build . --file Dockerfile --tag $dejanrojko/ci-cd:${{ steps.timestamp.outputs.date }}
+          docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}
 
+      # Debug print the Docker tag for verification purposes.
       - name: Debug print Docker tag
         run: |
-          echo "Docker tag: $dejanrojko/ci-cd:${{ steps.timestamp.outputs.date }}"
+          echo "Docker tag: $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}"
 
-      - name: Push Docker image to DockerHub  # Potisni sliko Docker v DockerHub.
+      # Push the Docker image to DockerHub.
+      - name: Push Docker image to DockerHub
         run: |
-          docker push $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}  # Potisnite sliko Docker s trenutnim časovnim žigom
-
-
+          docker push $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}
