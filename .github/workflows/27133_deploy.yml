@@ -1,46 +1,35 @@
-name: Deploy Workflow
+name: Deploy
 
-# Define environment variables including Docker username, password, and repository name.
 env:
-  DOCKER_USERNAME: ${{ env.DOCKER_USERNAME }}  # DockerHub username
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  # DockerHub password
-  REPONAME: ${{ env.REPO_NAME }}  # Repository name
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  REPONAME: ${{ secrets.REPO_NAME }}
 
 on:
   workflow_run:
-    workflows: ["Test Workflow"]
+    workflows: ["Test workflow"]
     types:
       - completed
 
 jobs:
-  deploy_to_dockerhub:
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: self-hosted
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-
     steps:
-      - name: Checkout code
+      - name: Checkout repozitorija
         uses: actions/checkout@v2
-
-      - name: Docker login
+      
+      - name: Prijava v Docker
         run: |
-          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
-      # Use a timestamp to uniquely tag the Docker image.
-      - name: Get current timestamp
-        id: timestamp
-        run: echo "date=$(date +'%Y-%m-%d--%M-%S')" >> "$GITHUB_ENV"
-
-      # Build the Docker image with a unique tag based on the timestamp.
-      - name: Build Docker image
+      - name: Trenutni čas
+        run: echo "date=$(date +'%Y-%m-%d--%H-%M-%S')" >> "$GITHUB_ENV"
+      
+      - name: Zgradi docker sliko
         run: |
-          docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}
+          docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ env.date }}
 
-      # Debug print the Docker tag for verification purposes.
-      - name: Debug print Docker tag
+      - name: Potisni docker sliko
         run: |
-          echo "Docker tag: $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}"
-
-      # Push the Docker image to DockerHub.
-      - name: Push Docker image to DockerHub
-        run: |
-          docker push $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}
+          docker push $DOCKER_USERNAME/$REPONAME:${{ env.date }}
