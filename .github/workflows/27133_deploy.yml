@@ -29,8 +29,9 @@ jobs:
 
       - name: Build Docker image  # Zgradite sliko Docker
         run: |
-          echo ${{ steps.timestamp.outputs.date }}  # Izpiši trenutni časovni žig
-          docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}  # Označite sliko Docker s trenutnim časovnim žigom
+          echo ${{ steps.datum.outputs.date }}
+          echo "docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:$date"
+          docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:$date
 
       - name: Push Docker image to DockerHub  # Potisni sliko Docker v DockerHub
         run: |
