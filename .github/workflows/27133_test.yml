@@ -3,7 +3,7 @@ name: Test Workflow  # Ime delovnega toka
 on:
   push:
     branches:
-      - master # Test se zažene po potisku na glavno vejo
+      - master # test se zažene po potisku na glavno vejo
 
 jobs:
   setup_environment:
@@ -18,50 +18,55 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2  # Uporabi akcijo za nastavitev Pythona
         with:
-          python-version: ${{ matrix.python-version }} # Dinamična izbira verzije Pythona iz matrice
+          python-version: ${{ matrix.python-version }} 
 
       - name: Install dependencies  # Namesti odvisnosti s pip
         run: |
           chmod +x ./venv.sh
           ./venv.sh
-
-      - name: Save environment setup status  # Shrani rezultat namestitve v datoteko setup_status.txt
+      - name: Save environment setup artifacts  # Shrani rezultat namestitve v datoteko setup_status.txt
         run: |
           echo "Okolje uspešno nameščeno!" > setup_status.txt
 
-      - name: Upload setup status
+      - name: Upload setup artifacts  # Naloži rezultate namestitve kot artefakte
         uses: actions/upload-artifact@v2
         with:
-          name: setup-status
-          path: setup_status.txt
-
+          name: setup-artifacts  # Ime artefakta
+          path: |
+            setup_status.txt
   run_tests:
     runs-on: self-hosted
     needs: setup_environment
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2  # Uporabi akcijo za preverjanje kode
-
-      - name: Download setup status
+      - name: Download setup artifacts  # Prenesi artefakte iz prejšnjega dela
         uses: actions/download-artifact@v2
         with:
-          name: setup-status
+          name: setup-artifacts
 
-      - name: Check environment setup status
+      - name: Check environment setup status  # Preveri status namestitve okolja
         run: |
-          if [ -f setup_status.txt ]; then
-            cat setup_status.txt
+          if [ -f setup_status.txt ]; then  # Če obstaja datoteka setup_status.txt
+            cat setup_status.txt  # Izpiši vsebino datoteke
           else
             echo "Napaka: Namestitev okolja ni uspela. Preverite dnevnike namestitve."
-            exit 1
+            echo "Napaka: Namestitev okolja ni uspela. Preverite dnevnike namestitve." > error.txt
           fi
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Run tests # Zaženi teste
+        uses: actions/setup-python@v2  # Uporabi akcijo za nastavitev Pythona
         with:
-          python-version: '3.9'
+          python-version: '3.9'  # Različica Pythona 3.9
 
-      - name: Run tests
+      - name: Install dependencies  # Namesti odvisnosti s pip.
         run: |
-          source $(pwd)/.venv/bin/activate
+          chmod +x ./venv.sh
+          ./venv.sh
           pytest test.py
+
+      - name: Check for test errors  # Preveri, ali so se pri testiranju pojavile napake
+        run: |
+          if [ -f error.txt ]; then  # Če obstaja datoteka error.txt
+            echo "Napaka: Testi so spodleteli. Glejte dnevnike testiranja za podrobnosti."
+            echo "Napaka: Testi so spodleteli. Glejte dnevnike testiranja za podrobnosti." > test_error.txt
+            exit 1
+          fi
