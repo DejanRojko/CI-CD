@@ -25,39 +25,43 @@ jobs:
           chmod +x ./venv.sh
           ./venv.sh
 
-      - name: Save environment setup artifacts  # Shrani rezultat namestitve v datoteko setup_status.txt
+      - name: Save environment setup status  # Shrani rezultat namestitve v datoteko setup_status.txt
         run: |
           echo "Okolje uspešno nameščeno!" > setup_status.txt
 
-      - name: Upload setup artifacts  # Naloži rezultate namestitve kot artefakte
+      - name: Upload setup status
         uses: actions/upload-artifact@v2
         with:
-          name: setup-artifacts  # Ime artefakta
+          name: setup-status
           path: setup_status.txt
 
   run_tests:
     runs-on: self-hosted
     needs: setup_environment
     steps:
-      - name: Download setup artifacts  # Prenesi artefakte iz prejšnjega dela
+      - name: Checkout code
+        uses: actions/checkout@v2  # Uporabi akcijo za preverjanje kode
+
+      - name: Download setup status
         uses: actions/download-artifact@v2
         with:
-          name: setup-artifacts
+          name: setup-status
 
-      - name: Check environment setup status  # Preveri status namestitve okolja
+      - name: Check environment setup status
         run: |
-          if [ -f setup_status.txt ]; then  # Če obstaja datoteka setup_status.txt
-            cat setup_status.txt  # Izpiši vsebino datoteke
+          if [ -f setup_status.txt ]; then
+            cat setup_status.txt
           else
             echo "Napaka: Namestitev okolja ni uspela. Preverite dnevnike namestitve."
             exit 1
+          fi
 
-      - name: Run tests # Zaženi teste
-        run: |
-          pytest test.py  # Zažene testiranje brez dodatne nastavitve Pythona
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
 
-      - name: Check for test errors  # Preveri, ali so se pri testiranju pojavile napake
+      - name: Run tests
         run: |
-          if [ -f error.txt ]; then  # Če obstaja datoteka error.txt
-            echo "Napaka: Testi so spodleteli. Glejte dnevnike testiranja za podrobnosti."
-            exit 1
+          source $(pwd)/.venv/bin/activate
+          pytest test.py
