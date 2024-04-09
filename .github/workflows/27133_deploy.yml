@@ -31,7 +31,7 @@ jobs:
         run: |
           docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}
 
-      - name: Push Docker image to DockerHub  # Potisni sliko Docker v DockerHub
+      - name: Push Docker image to DockerHub  # Potisni sliko Docker v DockerHub.
         run: |
           docker push $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}  # Potisnite sliko Docker s trenutnim časovnim žigom
 
