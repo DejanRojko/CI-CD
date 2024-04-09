@@ -23,8 +23,3 @@ jobs:
         run: |
           chmod +x zapakiraj_27133.sh
           ./zapakiraj_27133.sh
-
-      - name: Download and run the Docker container
-        run: |
-          chmod +x zazeni_27133.sh
-          ./zazeni_27133.sh
