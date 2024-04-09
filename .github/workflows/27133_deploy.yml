@@ -33,7 +33,7 @@ jobs:
       # Build the Docker image with a unique tag based on the timestamp.
       - name: Build Docker image
         run: |
-          docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}
+          docker build . --file Dockerfile --tag dejanrojko/ci-cd:${{ steps.timestamp.outputs.date }}
 
       # Debug print the Docker tag for verification purposes.
       - name: Debug print Docker tag
