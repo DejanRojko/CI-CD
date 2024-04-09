@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Pull the latest image from Docker Hub
-docker pull "dejanrojko/ci-cd:latest"
+# Pull the most recent Docker image
+docker pull "$(docker images --format '{{.Repository}}:{{.Tag}}' | head -n 1)"
 
-# Run the container from the image
-docker run -d --name my_app "dejanrojko/ci-cd:latest"
+# Run the most recent Docker image
+docker run "$(docker images --format '{{.Repository}}:{{.Tag}}' | head -n 1)"
