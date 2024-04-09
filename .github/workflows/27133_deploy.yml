@@ -1,12 +1,12 @@
-name: Deploy Workflow
+name: Deploy Workflow  # Ime delovnega toka
 
 env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  REPONAME: ${{ secrets.REPO_NAME }}
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  # Uporabniško ime DockerHuba
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  # Geslo DockerHuba
+  REPONAME: ${{ secrets.REPO_NAME }}  # Ime repozitorija
 
 on:
-  workflow_run:
+  workflow_run:  # Sproži delovni tok, ko drug delovni tok (Test Workflow) konča
     workflows: ["Test Workflow"]
     types:
       - completed
@@ -14,25 +14,26 @@ on:
 jobs:
   deploy_to_dockerhub:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}  # Izvedi ta delovno nalogo samo, če je Test Workflow uspel
     steps:
-      - name: Checkout code
+      - name: Checkout code  # Pridobi kodo iz repozitorija
         uses: actions/checkout@v2
 
-      - name: Docker login
+      - name: Docker login  # Prijava v DockerHub
         run: |
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
-      - name: Get current timestamp
+      - name: Get current timestamp  # Pridobite trenutni časovni žig za označevanje slike Docker
         id: timestamp
         run: echo "::set-output name=date::$(date +'%Y-%m-%d--%M-%S')"
 
-      - name: Build Docker image
+      - name: Build Docker image  # Zgradite sliko Docker
         run: |
-          echo ${{ steps.timestamp.outputs.date }}
-          docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}
+          echo ${{ steps.timestamp.outputs.date }}  # Izpiši trenutni časovni žig
+          docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}  # Označite sliko Docker s trenutnim časovnim žigom
 
-      - name: Push Docker image to DockerHub
+      - name: Push Docker image to DockerHub  # Potisni sliko Docker v DockerHub
         run: |
-          docker push $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}
+          docker push $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}  # Potisnite sliko Docker s trenutnim časovnim žigom
+
 
