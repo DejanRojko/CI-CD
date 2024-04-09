@@ -23,6 +23,11 @@ jobs:
         run: |
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
+      - name: Debug print DOCKER_USERNAME and REPONAME
+        run: |
+          echo "DOCKER_USERNAME: $DOCKER_USERNAME"
+          echo "REPONAME: $REPONAME"
+
       - name: Get current timestamp  # Pridobite trenutni časovni žig za označevanje slike Docker
         id: timestamp
         run: echo "date=$(date +'%Y-%m-%d--%M-%S')" >> "$GITHUB_ENV"
