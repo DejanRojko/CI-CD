@@ -1,3 +1,5 @@
+name: Test Workflow  # Ime delovnega toka
+
 on:
   push:
     branches:
@@ -6,16 +8,14 @@ on:
 jobs:
   setup_environment:
     runs-on: self-hosted
-    strategy:
-      matrix:
-        python-version: ['3.8', '3.9'] # Uporaba matrice samo za prvo nastavitev okolja
     steps:
       - name: Checkout code
         uses: actions/checkout@v2  # Uporabi akcijo za preverjanje kode
+
       - name: Set up Python
         uses: actions/setup-python@v2  # Uporabi akcijo za nastavitev Pythona
         with:
-          python-version: ${{ matrix.python-version }} 
+          python-version: '3.9'  # Različica Pythona 3.9
 
       - name: Install dependencies  # Namesti odvisnosti s pip
         run: |
