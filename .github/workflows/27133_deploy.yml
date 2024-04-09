@@ -2,9 +2,9 @@ name: Deploy Workflow
 
 # Define environment variables including Docker username, password, and repository name.
 env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  # DockerHub username
-  DOCKER_PASSWORD: ${{ variable.DOCKER_PASSWORD }}  # DockerHub password
-  REPONAME: ${{ variable.REPO_NAME }}  # Repository name
+  DOCKER_USERNAME: ${{ env.DOCKER_USERNAME }}  # DockerHub username
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  # DockerHub password
+  REPONAME: ${{ env.REPO_NAME }}  # Repository name
 
 on:
   workflow_run:
