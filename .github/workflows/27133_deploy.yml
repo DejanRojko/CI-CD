@@ -23,19 +23,23 @@ jobs:
         run: |
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
-      - name: Debug print DOCKER_USERNAME and REPONAME
-        run: |
-          echo "DOCKER_USERNAME: $DOCKER_USERNAME"
-          echo "REPONAME: $REPONAME"
+      #- name: Debug print DOCKER_USERNAME and REPONAME
+      #  run: |
+      #    echo "DOCKER_USERNAME: $DOCKER_USERNAME"
+      #   echo "REPONAME: $REPONAME"
 
       - name: Get current timestamp  # Pridobite trenutni časovni žig za označevanje slike Docker
         id: timestamp
         run: echo "date=$(date +'%Y-%m-%d--%M-%S')" >> "$GITHUB_ENV"
 
-      - name: Build Docker image  # Zgradite sliko Docker.
+      - name: Build Docker image
         run: |
           echo ${{ steps.timestamp.outputs.date }}
           docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}
+
+      - name: Debug print Docker tag
+        run: |
+          echo "Docker tag: $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}"
 
       - name: Push Docker image to DockerHub  # Potisni sliko Docker v DockerHub.
         run: |
