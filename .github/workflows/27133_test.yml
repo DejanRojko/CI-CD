@@ -55,12 +55,12 @@ jobs:
             echo "Napaka: Namestitev okolja ni uspela. Preverite dnevnike namestitve."
             exit 1
 
-      - name: Set up Python
-        uses: actions/setup-python@v2  # Ponovno nastavi Python glede na matrico
+      - name: Run tests # Zaženi teste
+        uses: actions/setup-python@v2  # Uporabi akcijo za nastavitev Pythona
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.9'  # Različica Pythona 3.9
 
-      - name: Install dependencies and run tests  # Namesti odvisnosti in zaženi teste
+      - name: Install dependencies  # Namesti odvisnosti s pip.
         run: |
           chmod +x ./venv.sh
           ./venv.sh
@@ -70,4 +70,6 @@ jobs:
         run: |
           if [ -f error.txt ]; then  # Če obstaja datoteka error.txt
             echo "Napaka: Testi so spodleteli. Glejte dnevnike testiranja za podrobnosti."
+            echo "Napaka: Testi so spodleteli. Glejte dnevnike testiranja za podrobnosti." > test_error.txt
             exit 1
+          fi
