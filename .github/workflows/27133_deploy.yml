@@ -27,7 +27,7 @@ jobs:
         id: timestamp
         run: echo "date=$(date +'%Y-%m-%d--%M-%S')" >> "$GITHUB_ENV"
 
-      - name: Build Docker image  # Zgradite sliko Docker
+      - name: Build Docker image  # Zgradite sliko Docker.
         run: |
           echo ${{ steps.datum.outputs.date }}
           echo "docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:$date"
