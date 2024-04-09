@@ -25,7 +25,7 @@ jobs:
 
       - name: Get current timestamp  # Pridobite trenutni časovni žig za označevanje slike Docker
         id: timestamp
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d--%M-%S')"
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d--%S-%M')"
 
       - name: Build Docker image  # Zgradite sliko Docker
         run: |
