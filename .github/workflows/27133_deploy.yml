@@ -35,11 +35,11 @@ jobs:
       - name: Build Docker image
         run: |
           echo ${{ steps.timestamp.outputs.date }}
-          docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}
+          docker build . --file Dockerfile --tag $dejanrojko/ci-cd:${{ steps.timestamp.outputs.date }}
 
       - name: Debug print Docker tag
         run: |
-          echo "Docker tag: $DOCKER_USERNAME/$REPONAME:${{ steps.timestamp.outputs.date }}"
+          echo "Docker tag: $dejanrojko/ci-cd:${{ steps.timestamp.outputs.date }}"
 
       - name: Push Docker image to DockerHub  # Potisni sliko Docker v DockerHub.
         run: |
