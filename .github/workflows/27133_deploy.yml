@@ -1,39 +1,30 @@
-# Ime delovnega procesa
-name: Deploy
+name: Continuous Integration and Deployment
 
-# Okoljske spremenljivke uporabljene v delovnem procesu
-env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }} # Uporabniško ime za Docker Hub
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }} # Geslo za Docker Hub
-  REPONAME: ${{ secrets.REPO_NAME }} # Ime repozitorija na Docker Hub-u
-
-# Dogodki, ki sprožijo delovni proces
 on:
   workflow_run:
-    workflows: ["Test workflow"] # Imena delovnih tokov, ki ob uspehu sprožijo ta delovni tok
+    workflows: ["Test workflow"]
     types:
-      - completed # Ta delovni tok se sproži, ko je prejšnji delovni tok zaključen
+      - completed
 
-# Opravila, ki se izvajajo v tem delovnem procesu
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  REPONAME: ${{ secrets.REPO_NAME }}
+
 jobs:
   deploy:
-    runs-on: self-hosted # Opravilo se izvede na samo-gostiteljskem strežniku
-    if: ${{ github.event.workflow_run.conclusion == 'success' }} # Pogoj za izvedbo, preveri uspeh prejšnjega delovnega toka
+    runs-on: self-hosted
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - name: Checkout repozitorija
-        uses: actions/checkout@v2 # Pridobivanje kode iz repozitorija
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Prijava v Docker
+      - name: Build and push Docker image
         run: |
-          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin # Prijava v Docker Hub
+          chmod +x zapakiraj_27133.sh
+          ./zapakiraj_27133.sh
 
-      - name: Trenutni čas
-        run: echo "date=$(date +'%Y-%m-%d--%H-%M-%S')" >> "$GITHUB_ENV" # Shrani trenutni čas v okoljsko spremenljivko 'date'
-
-      - name: Zgradi docker sliko
+      - name: Download and run the Docker container
         run: |
-          docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPONAME:${{ env.date }} # Gradnja Docker slike s tagom, ki vsebuje trenutni čas
-
-      - name: Potisni docker sliko
-        run: |
-          docker push $DOCKER_USERNAME/$REPONAME:${{ env.date }} # Potisni Docker sliko v Docker Hub repozitorij
+          chmod +x zazeni_27133.sh
+          ./zazeni_27133.sh
